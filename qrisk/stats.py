@@ -143,15 +143,19 @@ def aggregate_returns(returns, convert_to):
         return cum_returns(x)[-1]
 
     if convert_to == WEEKLY:
-        return returns.resample('W', how={'Agg': cumulate_returns})
+        aggregate = returns.resample('W', how={'Agg': cumulate_returns})
+        aggregate.index = [aggregate.index.year, aggregate.index.week]
     elif convert_to == MONTHLY:
-        return returns.resample('M', how={'Agg': cumulate_returns})
+        aggregate = returns.resample('M', how={'Agg': cumulate_returns})
+        aggregate.index = [aggregate.index.year, aggregate.index.month]
     elif convert_to == YEARLY:
-        return returns.resample('A', how={'Agg': cumulate_returns})
+        aggregate = returns.resample('A', how={'Agg': cumulate_returns})
+        aggregate.index = [aggregate.index.year]
     else:
         ValueError(
             'convert_to must be {}, {} or {}'.format(WEEKLY, MONTHLY, YEARLY)
         )
+    return aggregate['Agg']
 
 
 def max_drawdown(returns):
